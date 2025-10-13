@@ -13,6 +13,13 @@ public static class SeviceCollectionExtensions
 
         services.AddPersistence(configuration);
 
+        // Register Swagger
+        services.AddSwaggerWithJwtAuth(
+            title: "DoNet API",
+            version: "null",
+            description: "DoNet API documentation"
+        );
+
         return services;
     }
 }
