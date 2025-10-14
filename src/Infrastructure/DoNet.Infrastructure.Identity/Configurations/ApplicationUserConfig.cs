@@ -16,12 +16,14 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.Property(x => x.Gender).IsRequired();
         builder.Property(x => x.BirthDate).IsRequired();
         builder.Property(x => x.IsActived).IsRequired();
+        builder.Property(x => x.LastPasswordChangedAt).IsRequired(false);
 
         // Index
         builder.HasIndex(x => x.FirstName);
         builder.HasIndex(x => x.LastName);
         builder.HasIndex(x => x.BirthDate);
         builder.HasIndex(X => X.IsActived);
+        builder.HasIndex(x => x.LastPasswordChangedAt);
 
         // Relation
         builder.HasMany(x => x.RefreshTokens)

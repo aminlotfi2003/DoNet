@@ -31,4 +31,8 @@ public class RefreshToken
         => new(userId, tokenHash, expiresAt);
 
     public void Revoke() => Revoked = true;
+
+    public bool IsExpired(DateTimeOffset utcNow) => ExpiresAt <= utcNow;
+
+    public bool IsActive(DateTimeOffset utcNow) => !Revoked && !IsExpired(utcNow);
 }

@@ -9,6 +9,7 @@ public class ApplicationUser : IdentityUser<Guid>
     public Gender? Gender { get; set; }
     public DateTimeOffset? BirthDate { get; set; }
     public bool IsActived { get; set; }
+    public DateTimeOffset? LastPasswordChangedAt { get; set; }
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new HashSet<RefreshToken>();
 }
 
