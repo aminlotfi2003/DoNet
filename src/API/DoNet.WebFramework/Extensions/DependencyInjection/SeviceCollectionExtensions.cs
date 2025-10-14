@@ -9,16 +9,23 @@ public static class SeviceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddApplication();
+        // Register Dependencies Layers
+        services.AddApplication()
+                .AddPersistence(configuration);
 
-        services.AddPersistence(configuration);
+        // Register API Versioning
+        services.AddApiVersioningDependencies();
 
         // Register Swagger
         services.AddSwaggerWithJwtAuth(
             title: "DoNet API",
-            version: "null",
+            version: "v1",
             description: "DoNet API documentation"
         );
+
+        // Register Services
+        services.AddAuthentication();
+        services.AddHttpContextAccessor();
 
         return services;
     }

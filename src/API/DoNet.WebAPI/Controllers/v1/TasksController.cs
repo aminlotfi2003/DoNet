@@ -15,37 +15,38 @@ using DoNet.Application.Tasks.Queries.GetTaskById;
 using DoNet.Application.Tasks.Queries.GetTaskComments;
 using DoNet.Application.Tasks.Queries.GetTaskDetails;
 using DoNet.Application.Tasks.Queries.GetTasksByProject;
-using Enum = DoNet.Domain.Entities.Enum;
+using DoNet.WebFramework.Contracts.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DoNet.WebAPI.Controllers;
+namespace DoNet.WebAPI.Controllers.v1;
 
 [ApiController]
-[Route("api/tasks")]
-public sealed class TasksController : ControllerBase
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/tasks")]
+public sealed class TasksController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IMediator _mediator = mediator;
 
-    public TasksController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
+    #region Get Task By Id
     [HttpGet("{taskId:guid}")]
     public async Task<ActionResult<TaskSummaryDto>> GetTask(Guid taskId)
     {
         var task = await _mediator.Send(new GetTaskByIdQuery(taskId));
         return task is null ? NotFound() : Ok(task);
     }
+    #endregion
 
+    #region Get Task Details
     [HttpGet("{taskId:guid}/details")]
     public async Task<ActionResult<TaskDetailsDto>> GetTaskDetails(Guid taskId)
     {
         var details = await _mediator.Send(new GetTaskDetailsQuery(taskId));
         return details is null ? NotFound() : Ok(details);
     }
+    #endregion
 
+    #region Get Task Assignments
     [HttpGet("{taskId:guid}/assignments")]
     public async Task<ActionResult<IReadOnlyCollection<TaskAssignmentDto>>> GetTaskAssignments(Guid taskId)
     {
@@ -59,7 +60,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Get Task Comments
     [HttpGet("{taskId:guid}/comments")]
     public async Task<ActionResult<IReadOnlyCollection<CommentDto>>> GetTaskComments(Guid taskId)
     {
@@ -73,7 +76,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Get Task By Project
     [HttpGet("by-project/{projectId:guid}")]
     public async Task<ActionResult<IReadOnlyCollection<TaskSummaryDto>>> GetTasksByProject(
         Guid projectId,
@@ -82,7 +87,9 @@ public sealed class TasksController : ControllerBase
         var tasks = await _mediator.Send(new GetTasksByProjectQuery(projectId, includeArchived));
         return Ok(tasks);
     }
+    #endregion
 
+    #region Create Task
     [HttpPost]
     public async Task<ActionResult<TaskSummaryDto>> CreateTask(CreateTaskRequest request)
     {
@@ -96,7 +103,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Rename Task
     [HttpPut("{taskId:guid}/name")]
     public async Task<ActionResult<TaskSummaryDto>> RenameTask(Guid taskId, RenameTaskRequest request)
     {
@@ -110,7 +119,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Update Task Description
     [HttpPut("{taskId:guid}/description")]
     public async Task<ActionResult<TaskSummaryDto>> UpdateTaskDescription(Guid taskId, UpdateTaskDescriptionRequest request)
     {
@@ -124,7 +135,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Change Task Status
     [HttpPut("{taskId:guid}/status")]
     public async Task<ActionResult<TaskSummaryDto>> ChangeTaskStatus(Guid taskId, ChangeTaskStatusRequest request)
     {
@@ -138,7 +151,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Change Task Priority
     [HttpPut("{taskId:guid}/priority")]
     public async Task<ActionResult<TaskSummaryDto>> ChangeTaskPriority(Guid taskId, ChangeTaskPriorityRequest request)
     {
@@ -152,7 +167,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Schedule Task
     [HttpPut("{taskId:guid}/schedule")]
     public async Task<ActionResult<TaskSummaryDto>> ScheduleTask(Guid taskId, ScheduleTaskRequest request)
     {
@@ -166,7 +183,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Assign User to Task
     [HttpPost("{taskId:guid}/assignees")]
     public async Task<ActionResult<TaskAssignmentDto>> AssignUserToTask(Guid taskId, AssignUserToTaskRequest request)
     {
@@ -180,7 +199,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Unassign User from Task
     [HttpDelete("{taskId:guid}/assignees/{userId:guid}")]
     public async Task<ActionResult<TaskAssignmentDto>> UnassignUserFromTask(Guid taskId, Guid userId)
     {
@@ -194,7 +215,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Add Comment
     [HttpPost("{taskId:guid}/comments")]
     public async Task<ActionResult<CommentDto>> AddComment(Guid taskId, AddTaskCommentRequest request)
     {
@@ -208,7 +231,9 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
+    #endregion
 
+    #region Archive Task
     [HttpPost("{taskId:guid}/archive")]
     public async Task<ActionResult<TaskSummaryDto>> ArchiveTask(Guid taskId)
     {
@@ -222,25 +247,5 @@ public sealed class TasksController : ControllerBase
             return NotFound();
         }
     }
-
-    public sealed record CreateTaskRequest(
-        Guid ProjectId,
-        string Title,
-        string? Description,
-        Enum.TaskPriority Priority,
-        DateTimeOffset? DueDate);
-
-    public sealed record RenameTaskRequest(string Title);
-
-    public sealed record UpdateTaskDescriptionRequest(string? Description);
-
-    public sealed record ChangeTaskStatusRequest(Enum.TaskStatus Status);
-
-    public sealed record ChangeTaskPriorityRequest(Enum.TaskPriority Priority);
-
-    public sealed record ScheduleTaskRequest(DateTimeOffset? DueDate);
-
-    public sealed record AssignUserToTaskRequest(Guid UserId, Enum.TaskAssignmentRole Role);
-
-    public sealed record AddTaskCommentRequest(Guid AuthorId, string Body);
+    #endregion
 }
