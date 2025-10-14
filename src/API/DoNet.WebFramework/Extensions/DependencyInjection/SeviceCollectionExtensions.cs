@@ -1,4 +1,5 @@
 ﻿using DoNet.Application.Extensions.DependencyInjection;
+using DoNet.Infrastructure.Identity.Extensions.DependencyInjection;
 using DoNet.Infrastructure.Persistence.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,8 @@ public static class SeviceCollectionExtensions
     {
         // Register Dependencies Layers
         services.AddApplication()
-                .AddPersistence(configuration);
+                .AddPersistence(configuration)
+                .AddIdentity(configuration);
 
         // Register API Versioning
         services.AddApiVersioningDependencies();
