@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DoNet.Application.Identity.Commands.ChangePassword;
 
-internal sealed class ChangePasswordAfter90DaysCommandHandler : IRequestHandler<ChangePasswordCommand, AuthenticationResultDto>
+internal sealed class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, AuthenticationResultDto>
 {
     private static readonly TimeSpan RequiredInterval = TimeSpan.FromDays(90);
 
@@ -16,7 +16,7 @@ internal sealed class ChangePasswordAfter90DaysCommandHandler : IRequestHandler<
     private readonly ITokenService _tokenService;
     private readonly IDateTimeProvider _clock;
 
-    public ChangePasswordAfter90DaysCommandHandler(
+    public ChangePasswordCommandHandler(
         UserManager<ApplicationUser> userManager,
         IRefreshTokenRepository refreshTokens,
         ITokenService tokenService,

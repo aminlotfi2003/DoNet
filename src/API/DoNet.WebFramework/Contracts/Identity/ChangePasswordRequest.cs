@@ -1,3 +1,3 @@
 ﻿namespace DoNet.WebFramework.Contracts.Identity;
 
-public sealed record ChangePasswordAfter90DaysRequest(string CurrentPassword, string NewPassword);
+public sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword);

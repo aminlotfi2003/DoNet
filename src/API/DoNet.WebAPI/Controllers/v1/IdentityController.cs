@@ -83,11 +83,11 @@ public sealed class IdentityController(IMediator mediator) : ControllerBase
     }
     #endregion
 
-    #region Change Password 
+    #region Change Password
     [HttpPost("users/{userId:guid}/password/rotate")]
     public async Task<ActionResult<AuthenticationResultDto>> RotatePasswordAfter90Days(
         Guid userId,
-        ChangePasswordAfter90DaysRequest request)
+        ChangePasswordRequest request)
     {
         try
         {
